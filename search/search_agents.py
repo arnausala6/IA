@@ -511,7 +511,7 @@ def food_heuristic(state, problem):
     consistent as well.
 
     If using A* ever finds a solution that is worse uniform cost search finds,
-    your heuristic is *not* consistent, and probably not admissible!  On the
+    your heuristic is not consistent, and probably not admissible!  On the
     other hand, inadmissible or inconsistent heuristics may find optimal
     solutions, so be careful.
 
@@ -523,16 +523,53 @@ def food_heuristic(state, problem):
     problem.  For example, problem.walls gives you a Grid of where the walls
     are.
 
-    If you want to *store* information to be reused in other calls to the
+    If you want to store information to be reused in other calls to the
     heuristic, there is a dictionary called problem.heuristic_info that you can
     use. For example, if you only want to count the walls once and store that
     value, try: problem.heuristic_info['wallCount'] = problem.walls.count()
     Subsequent calls to this heuristic can access
     problem.heuristic_info['wallCount']
     """
+    "* YOUR CODE HERE *"
+
     position, food_grid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    remaining_food = food_grid.as_list()
+    
+    # there is no food remaining
+    if not remaining_food:
+        return 0
+
+    h_min_dist = 0
+    min_dist_to_food = float('inf') # minimum admissible cost
+    
+    for food_pos in remaining_food:
+        # we are using Manhattan Distance
+        dist = abs(position[0] - food_pos[0]) + abs(position[1] - food_pos[1])
+        if dist < min_dist_to_food:
+            min_dist_to_food = dist
+            
+    h_min_dist = min_dist_to_food
+    
+    h_max_gap = 0
+    max_pair_dist = 0
+    
+    if len(remaining_food) > 1:
+        # we itereate over the remaining food positions
+        for i in range(len(remaining_food)):
+            for j in range(i + 1, len(remaining_food)):
+                foodX = remaining_food[i]
+                foodY = remaining_food[j]
+                
+                # manhattan distance
+                dist = abs(foodX[0] - foodY[0]) + abs(foodX[1] - foodY[1])
+                
+                if dist > max_pair_dist:
+                    max_pair_dist = dist
+                
+    h_max_gap = max_pair_dist
+    
+    #we compute the max value of the two admissible bounds
+    return max(h_min_dist, h_max_gap)
 
 
 def simplified_corners_heuristic(state, problem):
