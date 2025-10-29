@@ -62,7 +62,7 @@ class SearchAgent(Agent):
     """
     This very general search agent finds a path using a supplied search
     algorithm for a supplied search problem, then returns actions to follow that
-    path.
+    path. 
 
     As a default, this agent runs DFS on a PositionSearchProblem to find
     location (1,1)
