@@ -134,56 +134,99 @@ def depth_first_search(problem):
     print("Start's successors:", problem.get_successors(problem.get_start_state()))
     
     "*** YOUR CODE HERE ***"
-    expanded_nodes = set()
-    frontier = util.Stack()
+    expanded_nodes = set() #we initialise the expanded nodes and frontier like a set and stak.
+    frontier = util.Stack() 
     
     start_node = SearchNode(parent = None, node_info =(problem.get_start_state(), None, 0) )
-    frontier.push(start_node)
+    frontier.push(start_node) # initialise the start node
 
-    final_state = False
-    
-    while final_state == False:
-        if frontier.is_empty:
-            return -1
+    while not frontier.is_empty(): #loop for search the childrens
         
         node = frontier.pop()
+
+        if problem.is_goal_state(node.state):
+             return node.get_path()
 
         if node.state in expanded_nodes:
             continue
         
         expanded_nodes.add(node.state)
 
-        if problem.is_goal_state(node.state):
-            return node.get_path()
-        
-
-        #solu chat
-        for next_state, action, cost in problem.get_successors(node.state):
+        for next_state, action, cost in problem.get_successors(node.state): # search all the childrens in the node state
             child_node = SearchNode(parent=node, node_info=(next_state, action, cost))
-            frontier.push(child_node)
-        #########
-
-        expanded_nodes.add(node)
-        if problem.is_goal_state(node) == True:
-            final_state == true
-            return path.get_path(node)
-        
+            
+            #check to avoid adding expanded nodes that are already in place 
+            if child_node.state not in expanded_nodes: 
+                frontier.push(child_node)
         
     return []
-
-    util.raise_not_defined()
 
 
 
 def breadth_first_search(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raise_not_defined()
+    
+    expanded_nodes = set()
+    frontier = util.Queue() #use queue until stack
+    
+    start_node = SearchNode(parent=None, node_info=(problem.get_start_state(), None, 0))
+    frontier.push(start_node)
+
+    while not frontier.is_empty():
+        
+        node = frontier.pop() #Remove the next node to be expanded from the front of the queue.
+
+        if problem.is_goal_state(node.state):
+            return node.get_path()
+            #If the goal is found, return the path.
+
+        if node.state in expanded_nodes:
+            continue
+            
+        expanded_nodes.add(node.state)#Mark the current state as visited/expanded to avoid processing it again.
+        
+
+        for next_state, action, step_cost in problem.get_successors(node.state):
+
+            child_node = SearchNode(parent=node, node_info=(next_state, action, step_cost))
+            
+            if next_state not in expanded_nodes:
+                frontier.push(child_node)#Add unexpanded successors to the queue .
+
+    return []
+
 
 def uniform_cost_search(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raise_not_defined()
+    expanded_nodes = set()
+    frontier = util.PriorityQueue()
+    
+    start_node = SearchNode(parent=None, node_info=(problem.get_start_state(), None, 0))
+    frontier.push(start_node, start_node.cost) 
+
+    while not frontier.is_empty():
+    
+        node = frontier.pop() 
+
+        if problem.is_goal_state(node.state):
+            return node.get_path()
+
+        if node.state in expanded_nodes:
+            continue
+            
+        expanded_nodes.add(node.state)
+        
+
+        for next_state, action, step_cost in problem.get_successors(node.state):
+
+            child_node = SearchNode(parent=node, node_info=(next_state, action, step_cost))
+            
+            if next_state not in expanded_nodes:
+                frontier.push(child_node, child_node.cost)
+                
+    return []
 
 def null_heuristic(state, problem=None):
     """
@@ -195,7 +238,39 @@ def null_heuristic(state, problem=None):
 def a_star_search(problem, heuristic=null_heuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raise_not_defined()
+
+    expanded_nodes = set()
+    frontier = util.PriorityQueue()
+
+    start_node = SearchNode(parent=None, node_info=(problem.get_start_state(), None, 0))
+
+    priority = start_node.cost + heuristic(problem.get_start_state(), problem)
+    frontier.push(start_node, priority)
+
+    while not frontier.is_empty():
+        
+        node = frontier.pop() 
+
+        if problem.is_goal_state(node.state):
+            return node.get_path()
+
+        if node.state in expanded_nodes:
+            continue
+            
+        expanded_nodes.add(node.state) 
+        
+
+        for next_state, action, step_cost in problem.get_successors(node.state):
+
+            child_node = SearchNode(parent=node, node_info=(next_state, action, step_cost))
+            
+            if next_state not in expanded_nodes:
+                new_priority = child_node.cost + heuristic(next_state, problem)
+                frontier.push(child_node, new_priority) 
+                
+    return []
+
+
 
 # Abbreviations
 bfs = breadth_first_search
