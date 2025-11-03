@@ -74,7 +74,27 @@ class ReflexAgent(Agent):
         new_scared_times = [ghostState.scared_timer for ghostState in new_ghost_states]
         
         "*** YOUR CODE HERE ***"
-        return successor_game_state.get_score()
+
+        score = successor_game_state.get_score()
+
+        # --- Fantasmas ---
+        for ghost, scared_time in zip(new_ghost_states, new_scared_times):
+            ghost_pos = ghost.get_position()
+            dist = util.manhattan_distance(new_pos, ghost_pos)
+            if scared_time == 0:
+                # Fantasma normal → penalización si está cerca
+                score -= 3 / (dist + 1)
+            else:
+                # Fantasma asustado → incentivo si está cerca
+                score += 3 / (dist + 1)
+
+        # --- Comida ---
+        food_list = new_food.as_list()
+        if food_list:
+            closest_food_dist = min(util.manhattan_distance(new_pos, food) for food in food_list)
+            score += 1 / (closest_food_dist + 1)
+
+        return score
 
 def score_evaluation_function(current_game_state):
     """
@@ -136,7 +156,51 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
+        def minimax(state, depth, agent_index):
+            # Terminal conditions: win, lose, or depth limit reached
+            if state.is_win() or state.is_lose() or depth == self.depth:
+                return self.evaluation_function(state)
+
+            num_agents = state.get_num_agents()
+
+            # PACMAN (MAX layer)
+            if agent_index == 0:
+                best_value = float('-inf')
+                for action in state.get_legal_actions(agent_index):
+                    successor = state.generate_successor(agent_index, action)
+                    value = minimax(successor, depth, 1)  # move to first ghost
+                    best_value = max(best_value, value)
+                return best_value
+
+            # GHOSTS (MIN layers)
+            else:
+                best_value = float('inf')
+                next_agent = agent_index + 1
+                if next_agent == num_agents:
+                    next_agent = 0
+                    next_depth = depth + 1
+                else:
+                    next_depth = depth
+
+                for action in state.get_legal_actions(agent_index):
+                    successor = state.generate_successor(agent_index, action)
+                    value = minimax(successor, next_depth, next_agent)
+                    best_value = min(best_value, value)
+                return best_value
+
+        # --- Root call (Pacman chooses the best action) ---
+        best_action = None
+        best_score = float('-inf')
+
+        for action in game_state.get_legal_actions(0):
+            successor = game_state.generate_successor(0, action)
+            value = minimax(successor, 0, 1)
+            if value > best_score:
+                best_score = value
+                best_action = action
+
+        return best_action
+        #util.raise_not_defined()
     
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
@@ -149,7 +213,50 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluation_function
         """
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
+            # Inicialización
+    num_agents = game_state.get_num_agents()
+    best_action = None
+    alpha = float('-inf')
+    beta = float('inf')
+
+    # Pila simulada (usaremos recursión manualmente)
+    def alpha_beta(state, depth, agent_index, alpha, beta):
+        # Si es un estado terminal o profundidad máxima
+        if depth == self.depth * num_agents or state.is_win() or state.is_lose():
+            return self.evaluation_function(state)
+
+        # Determinar si es turno de Pacman o un fantasma
+        if agent_index == 0:  # MAX (Pacman)
+            value = float('-inf')
+            for action in state.get_legal_actions(agent_index):
+                successor = state.generate_successor(agent_index, action)
+                value = max(value, alpha_beta(successor, depth + 1, (agent_index + 1) % num_agents, alpha, beta))
+                if value > beta:
+                    return value
+                alpha = max(alpha, value)
+            return value
+        else:  # MIN (Ghosts)
+            value = float('inf')
+            for action in state.get_legal_actions(agent_index):
+                successor = state.generate_successor(agent_index, action)
+                value = min(value, alpha_beta(successor, depth + 1, (agent_index + 1) % num_agents, alpha, beta))
+                if value < alpha:
+                    return value
+                beta = min(beta, value)
+            return value
+
+    # Decidir la mejor acción para Pacman (agente 0)
+    best_value = float('-inf')
+    for action in game_state.get_legal_actions(0):
+        successor = game_state.generate_successor(0, action)
+        value = alpha_beta(successor, 1, 1 % num_agents, alpha, beta)
+        if value > best_value:
+            best_value = value
+            best_action = action
+        alpha = max(alpha, best_value)
+
+    return best_action
+        #util.raise_not_defined()
 
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
