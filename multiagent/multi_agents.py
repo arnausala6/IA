@@ -229,55 +229,78 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         def value(state, depth, agent_index, alpha, beta):
-
+            num_agents = state.get_num_agents()
             # win/lose/max depth
-            if state.is_win() or state.is_lose() or depth == self.depth:
+            if depth == self.depth or state.is_win() or state.is_lose():
                 return self.evaluation_function(state)
 
-            num_agents = state.get_num_agents()
+             
+            next_agent = (agent_index + 1) % num_agents
+            next_depth = depth + 1 if next_agent == 0 else depth
 
             # pacman --> mqx ==> ALPHA
             if agent_index == 0:
                 v = float('-inf')
                 for action in state.get_legal_actions(agent_index):
                     successor = state.generate_successor(agent_index, action)
-                    v = max(v, value(successor, depth, 1, alpha, beta))
-                    if v > beta:
+
+                    v = max(v, value(successor, next_depth, next_agent, alpha, beta))
+
+                    if v > beta:    
                         return v
                     alpha = max(alpha, v)
+
                 return v
 
             # ghost --> min ==> BETA
             else:
                 v = float('inf')
-                next_agent = agent_index + 1
-                next_depth = depth
-                if next_agent == num_agents:  # all ghosts has moved
-                    next_agent = 0
-                    next_depth += 1
-
                 for action in state.get_legal_actions(agent_index):
                     successor = state.generate_successor(agent_index, action)
+
                     v = min(v, value(successor, next_depth, next_agent, alpha, beta))
-                    if v < alpha:
+
+                    if v < alpha:  
                         return v
                     beta = min(beta, v)
+
                 return v
 
         # choose best action out of the possibles
         alpha = float('-inf')
         beta = float('inf')
-        best_score = float('-inf')
         best_action = None
+        best_value = float('-inf')
 
         for action in game_state.get_legal_actions(0):
             successor = game_state.generate_successor(0, action)
             v = value(successor, 0, 1, alpha, beta)
-            if v > best_score:
-                best_score = v
+
+            if v > best_value:
+                best_value = v
                 best_action = action
-            # update max -> pacman (alpha)
-            alpha = max(alpha, best_score)
+             # update max -> pacman (alpha)
+            alpha = max(alpha, best_value)
+
+        return best_action
+
+
+
+        # choose best action out of the possibles
+        alpha = float('-inf')
+        beta = float('inf')
+        best_action = None
+        best_value = float('-inf')
+
+        for action in game_state.get_legal_actions(0):
+            successor = game_state.generate_successor(0, action)
+            v = value(successor, 0, 1, alpha, beta)
+
+            if v > best_value:
+                best_value = v
+                best_action = action
+             # update max -> pacman (alpha)
+            alpha = max(alpha, best_value)
 
         return best_action
 
