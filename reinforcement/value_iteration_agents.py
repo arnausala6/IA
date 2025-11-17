@@ -66,7 +66,28 @@ class ValueIterationAgent(ValueEstimationAgent):
           value iteration, V_k+1(...) depends on V_k(...)'s.
         """
         "*** YOUR CODE HERE ***"
-            
+
+        for i in range(self.iterations):
+            newValues = util.Counter()
+
+            for state in self.mdp.get_states():
+
+                if self.mdp.is_terminal(state):
+                    newValues[state] = 0
+                    continue #next state because this one is terminal
+                
+                actionValues = []
+                for action in self.mdp.get_possible_actions(state):
+                    q = self.compute_q_value_from_values(state, action)
+                    actionValues.append(q)
+
+                # the new state value is the max q-value
+                if len(actionValues) > 0:
+                    newValues[state] = max(actionValues)
+
+            self.values = newValues # next iter
+
+
     def get_value(self, state):
         """
           Return the value of the state (computed in __init__).
@@ -79,7 +100,18 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
+
+        q = 0
+        #we get next states and transitions probabs
+        transitions = self.mdp.get_transition_states_and_probs(state, action)
+
+        for nextState, probab in transitions:
+            #add the expected contribution
+            reward = self.mdp.get_reward(state, action, nextState)
+            q += probab * (reward + self.discount * self.values[nextState])
+
+        return q
+
 
     def compute_action_from_values(self, state):
         """
@@ -91,7 +123,20 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
+
+        actions = self.mdp.get_possible_actions(state)
+
+        bestAction = None #returns None if there are no legal actions
+        bestValue = float('-inf') #set to -inf to start iters
+
+        for action in actions:
+            q = self.compute_q_value_from_values(state, action)
+            if q > bestValue:
+                bestValue = q
+                bestAction = action
+
+        return bestAction
+
 
     def get_policy(self, state):
         return self.compute_action_from_values(state)

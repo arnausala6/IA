@@ -28,47 +28,44 @@ def question2():
     answer_discount = 0.9
     answer_noise = 0
     return answer_discount, answer_noise
+    #This answer was given in the notebook. Additionally, we want to add that by
+    #lowering the noise, we can make sure that the actions that we take end up
+    #where we want, so we are now sure that there is no risk of falling over
 
 def question3a():
-    answer_discount = 0.3
-    answer_noise = 0
-    answer_living_reward = 0
+    answer_discount = 0.3           #preferes immediate reward
+    answer_noise = 0                #there is no risk near the cliff  
+    answer_living_reward = 0        #preferes taking less steps
     return answer_discount, answer_noise, answer_living_reward
-    # If not possible, return 'NOT POSSIBLE'
 
 def question3b():
-    answer_discount = 0.3
-    answer_noise = 0.2
-    answer_living_reward = 0.1
+    answer_discount = 0.3           #preferes immediate reward
+    answer_noise = 0.2              #there is risk near the cliff    
+    answer_living_reward = 0.1      #preferes taking more steps
     return answer_discount, answer_noise, answer_living_reward
-    # If not possible, return 'NOT POSSIBLE'
 
 def question3c():
-    answer_discount = 0.9
-    answer_noise = 0
-    answer_living_reward = 0
+    answer_discount = 0.9           #preferes long-term reward
+    answer_noise = 0                #there is no risk near the cliff 
+    answer_living_reward = 0        #preferes taking less steps
     return answer_discount, answer_noise, answer_living_reward
-    # If not possible, return 'NOT POSSIBLE'
 
 def question3d():
-    answer_discount = 0.9
-    answer_noise = 0.2
-    answer_living_reward = 0
+    answer_discount = 0.9           #preferes long-term reward
+    answer_noise = 0.2              #there is risk near the cliff 
+    answer_living_reward = 0        #preferes taking less steps
     return answer_discount, answer_noise, answer_living_reward
-    # If not possible, return 'NOT POSSIBLE'
 
 def question3e():
-    answer_discount = 1
-    answer_noise = 0
-    answer_living_reward = 1
+    answer_discount = 1             #preferes long-term reward
+    answer_noise = 0                #there is no risk near the cliff 
+    answer_living_reward = 1        #will try to stay alive forever
     return answer_discount, answer_noise, answer_living_reward
-    # If not possible, return 'NOT POSSIBLE'
 
 def question8():
     answer_epsilon = None
     answer_learning_rate = None
     return answer_epsilon, answer_learning_rate
-    # If not possible, return 'NOT POSSIBLE'
 
 if __name__ == '__main__':
     print('Answers to analysis questions:')
