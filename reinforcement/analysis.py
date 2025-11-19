@@ -63,9 +63,14 @@ def question3e():
     return answer_discount, answer_noise, answer_living_reward
 
 def question8():
-    answer_epsilon = None
-    answer_learning_rate = None
-    return answer_epsilon, answer_learning_rate
+    """
+    Even with noiseless transitions, a Q-learner needs to cross the bridge to
+    observe the high reward. With only 50 episodes and any fixed epsilon/alpha,
+    there remains non-negligible probability it never commits to the optimal
+    path (especially if early random experience prefers the safer detour), so
+    we cannot guarantee >99% success independent of tie-breaking.
+    """
+    return 'NOT POSSIBLE'
 
 if __name__ == '__main__':
     print('Answers to analysis questions:')
