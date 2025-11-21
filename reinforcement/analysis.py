@@ -63,13 +63,11 @@ def question3e():
     return answer_discount, answer_noise, answer_living_reward
 
 def question8():
-    """
-    Even with noiseless transitions, a Q-learner needs to cross the bridge to
-    observe the high reward. With only 50 episodes and any fixed epsilon/alpha,
-    there remains non-negligible probability it never commits to the optimal
-    path (especially if early random experience prefers the safer detour), so
-    we cannot guarantee >99% success independent of tie-breaking.
-    """
+    
+    #Even if the environment has no noise, the agent only learns about the high reward if it actually goes over the bridge. 
+    #With just 50 episodes, there's still a decent chance it never really explores that path or it sticks to the safer one early on. 
+    # Because of that, we can’t guarantee something like a 99% success rate just by picking some epsilon and learning rate, no matter how tie-breaking works.
+    
     return 'NOT POSSIBLE'
 
 if __name__ == '__main__':
